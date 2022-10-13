@@ -1,3 +1,7 @@
+from sklearn import datasets
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_samples,silhouette_score
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -13,6 +17,8 @@ from datetime import date
 from yellowbrick.cluster import KElbowVisualizer
 from sklearn import metrics
 from sklearn.metrics import pairwise_distances
+import matplotlib.pyplot as plt
+
 wine = pd.read_csv('winequality-red.csv')
 wine.shape
 df = pd.read_csv('winequality-red.csv')
@@ -35,6 +41,8 @@ model = KMeans()
 visible = KElbowVisualizer(model, k=(1,10), timings = False)
 visible.fit(df)
 visible.show()
+
+
 bca = PCA()
 X = bca.fit_transform(df)
 kmeans = KMeans(n_clusters=3)
@@ -46,3 +54,23 @@ for i in graphics:
 plt.legend()
 plt.title('Wine After Drop pH')
 plt.show()
+
+
+#graphic
+sil = []
+for k in range(2, 11):
+  kmeans = KMeans(n_clusters = k).fit(df)
+  labels = kmeans.labels_
+  sil.append(silhouette_score(df, labels, metric = 'euclidean'))
+
+plt.plot(range(2,11), sil)
+plt.xticks(range(2,11))
+plt.xlabel("Number Clusters")
+plt.ylabel("Coefficient Silhouette")
+plt.show()
+
+#score
+for k in range(2,11):
+    kmeans = KMeans(n_clusters=k).fit(df)
+    Score = silhouette_score(df, kmeans.labels_, metric='euclidean')
+    print("{} For Silhouette Score : {}".format(k,Score))
